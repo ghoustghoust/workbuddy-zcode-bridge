@@ -1,0 +1,15 @@
+{
+  "name": "workbuddy-zcode-bridge",
+  "version": "0.1.0",
+  "description": "WorkBuddy 模型的 OpenAI 兼容本地网关，供 ZCode 等 OpenAI 协议客户端调用",
+  "type": "module",
+  "main": "server.mjs",
+  "bin": { "workbuddy-zcode-bridge": "server.mjs" },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node test/smoke.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT",
+  "private": false
+}
