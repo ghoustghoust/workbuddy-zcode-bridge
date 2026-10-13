@@ -79,7 +79,7 @@ check('wrong key rejected', (await fetch(BASE + '/v1/models', { headers: { autho
 
 // models（目录拉取 + 站点前缀）
 const models = await (await fetch(BASE + '/v1/models', { headers: H })).json()
-check('models carry realm prefixes', models.data.map((m) => m.id), ['cn/glm-5.3', 'cn/deepseek-v4.1-flash', 'global/glm-5.3', 'global/deepseek-v4.1-flash'])
+check('models carry realm prefixes', models.data.map((m) => m.id), ['cn/glm-5.3', 'cn/deepseek-v4.1-flash', 'cn/limited', 'global/glm-5.3', 'global/deepseek-v4.1-flash', 'global/limited'])
 
 // 流式对话 + reasoning + usage
 const chat = await fetch(BASE + '/v1/chat/completions', { method: 'POST', headers: H, body: JSON.stringify({ model: 'cn/glm-5.3', messages: [{ role: 'user', content: 'hi' }], stream: true }) })
