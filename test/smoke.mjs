@@ -90,6 +90,10 @@ check('stream reasoning then content', frames.some((f) => f.choices?.[0]?.delta?
 check('stream content delta', frames.some((f) => f.choices?.[0]?.delta?.content === 'hello'), true)
 check('stream ends with finish stop + usage', [frames.at(-1).choices[0].finish_reason, frames.at(-1).usage.prompt_tokens], ['stop', 100])
 check('upstream got system-first body', [upstreamSeen.at(-1).messages[0].role, upstreamSeen.at(-1).stream], ['system', true])
+// ZCode 真实形状：developer 角色 + content 分段数组 → 必须归一化为 system 字符串首条
+await fetch(BASE + '/v1/chat/completions', { method: 'POST', headers: H, body: JSON.stringify({ model: 'cn/glm-5.3', stream: false, messages: [{ role: 'developer', content: [{ type: 'text', text: 'zcode system prompt' }] }, { role: 'user', content: [{ type: 'text', text: 'q' }] }] }) })
+const norm = upstreamSeen.at(-1).messages
+check('developer role and array content normalized', [norm[0].role, typeof norm[0].content, norm[0].content, norm[1].role, typeof norm[1].content], ['system', 'string', 'zcode system prompt', 'user', 'string'])
 
 // 工具往返（agent 模式）
 const tool = await fetch(BASE + '/v1/chat/completions', { method: 'POST', headers: H, body: JSON.stringify({ model: 'cn/glm-5.3', stream: true, tools: [{ type: 'function', function: { name: 'run_cmd', parameters: { type: 'object', properties: {} } } }], messages: [{ role: 'user', content: 'run' }] }) })
