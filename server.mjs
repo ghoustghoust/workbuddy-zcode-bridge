@@ -56,6 +56,12 @@ async function cmdStatus() {
     } catch { /* 未登录 */ }
     console.log(line)
   }
+  const { availableModels } = await import('./lib/gateway.js')
+  for (const e of await availableModels(globalThis.fetch)) {
+    if (e.error) { console.log(`${e.label} 模型目录：获取失败（${e.error}）`); continue }
+    console.log(`${e.label} 可调用模型 ${e.ids.length} 个：`)
+    console.log('  ' + e.ids.map((id) => `${e.realmId}/${id}`).join('  '))
+  }
 }
 
 async function cmdServe() {
@@ -65,7 +71,16 @@ async function cmdServe() {
   await gateway.start()
   log(`OpenAI 兼容网关已启动：http://127.0.0.1:${cfg.port}/v1`)
   log(`API Key：${cfg.key}   ← 填入 ZCode 的自定义供应商`)
-  log('模型名带站点前缀，例如 cn/glm-5.3 或 global/deepseek-v4.1-flash')
+  const { availableModels } = await import('./lib/gateway.js')
+  const entries = await availableModels(globalThis.fetch)
+  let any = false
+  for (const e of entries) {
+    if (e.error) { log(`${e.label} 目录获取失败：${e.error}（不影响另一站点）`); continue }
+    any = true
+    log(`${e.label} 可调用模型（ZCode 里填站点前缀 + 模型名）：`)
+    console.log('  ' + e.ids.map((id) => `${e.realmId}/${id}`).join('  '))
+  }
+  if (!any) log('没有可调用模型：请先 node server.mjs login <站点> 扫码。')
 }
 
 const [, , cmd, arg] = process.argv
