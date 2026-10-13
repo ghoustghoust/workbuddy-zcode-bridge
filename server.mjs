@@ -42,6 +42,22 @@ async function cmdLogin(realmId) {
   }
 }
 
+async function cmdStatus() {
+  const cfg = loadConfig()
+  console.log(`配置目录：${DATA_DIR}（密钥与令牌长期保存，重启/重开机均有效）`)
+  console.log(`API Key：${cfg.key}`)
+  for (const id of REALM_IDS) {
+    let line = `${REALMS[id].label}：未登录（node server.mjs login ${id}）`
+    try {
+      const accFile = path.join(DATA_DIR, `account-${id}.json`)
+      const acc = JSON.parse(fs.readFileSync(accFile, 'utf8'))
+      const expiry = acc.expiresAt ? new Date(acc.expiresAt).toLocaleString('zh-CN') : '长期'
+      line = `${REALMS[id].label}：已登录（${acc.nickname ?? acc.uid}，令牌到期 ${expiry}）`
+    } catch { /* 未登录 */ }
+    console.log(line)
+  }
+}
+
 async function cmdServe() {
   const cfg = loadConfig()
   for (const id of REALM_IDS) log(`${REALMS[id].label}: ${isLoggedIn(id) ? '已登录' : '未登录（node server.mjs login ' + id + '）'}`)
@@ -54,4 +70,5 @@ async function cmdServe() {
 
 const [, , cmd, arg] = process.argv
 if (cmd === 'login') await cmdLogin(arg ?? 'cn')
+else if (cmd === 'status') await cmdStatus()
 else await cmdServe()

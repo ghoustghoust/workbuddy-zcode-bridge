@@ -1,0 +1,54 @@
+@echo off
+cd /d "%~dp0"
+title WorkBuddy ZCode 桥
+
+where node >/dev/null 2>/dev/null
+if errorlevel 1 (
+  echo [错误] 未找到 node，请先安装 Node.js 20+ 并加入 PATH。
+  pause
+  exit /b 1
+)
+
+:menu
+echo.
+echo ============ WorkBuddy ZCode 桥 ============
+echo   1. 启动网关   （ZCode 正常使用就选这个）
+echo   2. 登录国内版 （扫码，10 分钟内有效）
+echo   3. 登录国际版 （扫码，10 分钟内有效）
+echo   4. 查看 API Key 与登录状态
+echo   0. 退出
+echo ============================================
+set /p choice=请输入数字后回车: 
+if "%choice%"=="1" goto serve
+if "%choice%"=="2" goto login-cn
+if "%choice%"=="3" goto login-global
+if "%choice%"=="4" goto status
+if "%choice%"=="0" exit /b 0
+goto menu
+
+:login-cn
+chcp 65001 >/dev/null
+node server.mjs login cn
+chcp 936 >/dev/null
+goto menu
+
+:login-global
+chcp 65001 >/dev/null
+node server.mjs login global
+chcp 936 >/dev/null
+goto menu
+
+:status
+chcp 65001 >/dev/null
+node server.mjs status
+chcp 936 >/dev/null
+goto menu
+
+:serve
+chcp 65001 >/dev/null
+node server.mjs
+chcp 936 >/dev/null
+echo.
+echo 网关已停止。按任意键返回菜单。
+pause >/dev/null
+goto menu
