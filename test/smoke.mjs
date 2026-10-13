@@ -110,6 +110,10 @@ check('unlogged realm guides to login command', /login global/.test(noLogin.erro
 const limited = await fetch(BASE + '/v1/chat/completions', { method: 'POST', headers: H, body: JSON.stringify({ model: 'cn/limited', messages: [{ role: 'user', content: 'x' }] }) })
 check('429 passes through with retry-after', [limited.status, limited.headers.get('retry-after')], [429, '30'])
 
+// 未知模型在网关层拦截并列出可用项（防 gkm/glm 式笔误打到上游）
+const unknown = await (await fetch(BASE + '/v1/chat/completions', { method: 'POST', headers: H, body: JSON.stringify({ model: 'cn/gkm-5.3', messages: [{ role: 'user', content: 'x' }] }) })).json()
+check('unknown model rejected locally with available list', [unknown.error?.type, /cn\/glm-5\.3/.test(unknown.error?.message ?? '')], ['invalid_request_error', true])
+
 await gateway.close()
 await new Promise((r) => upstream.close(r))
 fs.rmSync(tmp, { recursive: true, force: true })
