@@ -32,7 +32,7 @@ const upstream = http.createServer((req, res) => {
     }
     if (url.includes('/v3/config')) {
       res.writeHead(200, { 'content-type': 'application/json' })
-      res.end(JSON.stringify({ code: 0, data: { models: [{ id: 'glm-5.3' }, { id: 'deepseek-v4.1-flash' }], agents: [{ tags: ['default'], models: ['glm-5.3', 'deepseek-v4.1-flash'] }] } }))
+      res.end(JSON.stringify({ code: 0, data: { models: [{ id: 'glm-5.3' }, { id: 'deepseek-v4.1-flash' }, { id: 'limited' }], agents: [{ tags: ['default'], models: ['glm-5.3', 'deepseek-v4.1-flash', 'limited'] }] } }))
       return
     }
     const parsed = JSON.parse(body || '{}')
